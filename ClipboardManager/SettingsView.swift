@@ -1,5 +1,6 @@
 import SwiftUI
 import AppKit
+import ServiceManagement
 
 struct SettingsView: View {
     @ObservedObject var monitor: ClipboardMonitor
@@ -40,6 +41,33 @@ struct SettingsView: View {
 
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+
+                    // Launch at Login
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("General")
+                            .font(.system(size: 12, weight: .semibold))
+                        Toggle("Launch at Login", isOn: Binding(
+                            get: { SMAppService.mainApp.status == .enabled },
+                            set: { newValue in
+                                do {
+                                    if newValue {
+                                        try SMAppService.mainApp.register()
+                                    } else {
+                                        try SMAppService.mainApp.unregister()
+                                    }
+                                } catch {
+                                    showStatusMessage("Error: \(error.localizedDescription)")
+                                }
+                            }
+                        ))
+                        .font(.system(size: 12))
+                        .toggleStyle(.checkbox)
+                        Text("Automatically start ClipboardManager when you log in")
+                            .font(.system(size: 10))
+                            .foregroundColor(.secondary)
+                    }
+
+                    Divider()
 
                     // Maximum Clips
                     VStack(alignment: .leading, spacing: 6) {
