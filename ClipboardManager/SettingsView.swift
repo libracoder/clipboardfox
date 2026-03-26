@@ -154,6 +154,34 @@ struct SettingsView: View {
                             .lineLimit(2)
                     }
 
+                    Divider()
+
+                    // Quit & Rebuild
+                    HStack(spacing: 12) {
+                        Button(action: { rebuildApp() }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "hammer")
+                                    .font(.system(size: 11))
+                                Text("Rebuild")
+                                    .font(.system(size: 12))
+                            }
+                        }
+                        .buttonStyle(.bordered)
+
+                        Spacer()
+
+                        Button(action: { NSApp.terminate(nil) }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "xmark.circle")
+                                    .font(.system(size: 11))
+                                Text("Quit")
+                                    .font(.system(size: 12))
+                            }
+                            .foregroundColor(.red)
+                        }
+                        .buttonStyle(.bordered)
+                    }
+
                     Spacer()
                 }
                 .padding(14)
@@ -215,6 +243,46 @@ struct SettingsView: View {
         withAnimation { showStatus = true }
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             withAnimation { showStatus = false }
+        }
+    }
+
+    private func rebuildApp() {
+        let projectDir = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("ClipboardManager")
+        let script = """
+        cd "\(projectDir.path)" && \
+        swift build -c release 2>&1 && \
+        cp .build/release/ClipboardManager build/ClipboardManager.app/Contents/MacOS/ && \
+        open build/ClipboardManager.app
+        """
+        showStatusMessage("Rebuilding...")
+        DispatchQueue.global().async {
+            let process = Process()
+            process.executableURL = URL(fileURLWithPath: "/bin/zsh")
+            process.arguments = ["-c", script]
+            let pipe = Pipe()
+            process.standardOutput = pipe
+            process.standardError = pipe
+            do {
+                try process.run()
+                process.waitUntilExit()
+                let output = String(data: pipe.fileHandleForReading.readDataToEndOfFile(), encoding: .utf8) ?? ""
+                DispatchQueue.main.async {
+                    if process.terminationStatus == 0 {
+                        showStatusMessage("Rebuild complete — restarting...")
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            NSApp.terminate(nil)
+                        }
+                    } else {
+                        showStatusMessage("Error: Build failed")
+                        print(output)
+                    }
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    showStatusMessage("Error: \(error.localizedDescription)")
+                }
+            }
         }
     }
 
