@@ -251,8 +251,7 @@ struct SettingsView: View {
             .appendingPathComponent("ClipboardManager")
         let script = """
         cd "\(projectDir.path)" && \
-        swift build -c release 2>&1 && \
-        cp .build/release/ClipboardManager build/ClipboardManager.app/Contents/MacOS/ && \
+        ./build.sh 2>&1 && \
         open build/ClipboardManager.app
         """
         showStatusMessage("Rebuilding...")

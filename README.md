@@ -22,11 +22,7 @@ A lightweight, searchable clipboard manager that lives in your macOS menu bar.
 ```bash
 git clone https://github.com/libracoder/ClipboardManager.git
 cd ClipboardManager
-swift build -c release
-mkdir -p build/ClipboardManager.app/Contents/{MacOS,Resources}
-cp .build/arm64-apple-macosx/release/ClipboardManager build/ClipboardManager.app/Contents/MacOS/
-cp AppIcon.icns build/ClipboardManager.app/Contents/Resources/
-cp ClipboardManager/Info.plist build/ClipboardManager.app/Contents/
+./build.sh
 open build/ClipboardManager.app
 ```
 
