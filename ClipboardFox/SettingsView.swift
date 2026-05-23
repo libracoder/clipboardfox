@@ -62,7 +62,7 @@ struct SettingsView: View {
                         ))
                         .font(.system(size: 12))
                         .toggleStyle(.checkbox)
-                        Text("Automatically start ClipboardManager when you log in")
+                        Text("Automatically start ClipboardFox when you log in")
                             .font(.system(size: 10))
                             .foregroundColor(.secondary)
                     }
@@ -147,7 +147,7 @@ struct SettingsView: View {
                         Text("Storage")
                             .font(.system(size: 12, weight: .semibold))
                         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-                        let storagePath = appSupport.appendingPathComponent("ClipboardManager/history.json").path
+                        let storagePath = appSupport.appendingPathComponent("ClipboardFox/history.json").path
                         Text(storagePath)
                             .font(.system(size: 10, design: .monospaced))
                             .foregroundColor(.secondary)
@@ -248,11 +248,11 @@ struct SettingsView: View {
 
     private func rebuildApp() {
         let projectDir = FileManager.default.homeDirectoryForCurrentUser
-            .appendingPathComponent("ClipboardManager")
+            .appendingPathComponent("clipboardfox")
         let script = """
         cd "\(projectDir.path)" && \
         ./build.sh 2>&1 && \
-        open build/ClipboardManager.app
+        open build/ClipboardFox.app
         """
         showStatusMessage("Rebuilding...")
         DispatchQueue.global().async {

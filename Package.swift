@@ -2,13 +2,13 @@
 import PackageDescription
 
 let package = Package(
-    name: "ClipboardManager",
+    name: "ClipboardFox",
     platforms: [.macOS(.v13)],
     targets: [
         .executableTarget(
-            name: "ClipboardManager",
-            path: "ClipboardManager",
-            exclude: ["Info.plist", "ClipboardManager.entitlements"]
+            name: "ClipboardFox",
+            path: "ClipboardFox",
+            exclude: ["Info.plist", "ClipboardFox.entitlements"]
         )
     ]
 )

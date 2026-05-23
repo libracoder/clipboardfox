@@ -72,7 +72,7 @@ class ClipboardMonitor: ObservableObject {
 
     init() {
         let appSupport = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first!
-        let dir = appSupport.appendingPathComponent("ClipboardManager")
+        let dir = appSupport.appendingPathComponent("ClipboardFox")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         storageURL = dir.appendingPathComponent("history.json")
 

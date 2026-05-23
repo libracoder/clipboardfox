@@ -58,11 +58,18 @@ macOS only remembers your *last* copy. ClipboardFox remembers **everything** —
 
 ### Download the latest DMG (recommended)
 
-Grab the universal `.dmg` from the [Releases page](https://github.com/libracoder/clipboardfox/releases/latest), open it, and drag **ClipboardManager.app** to **Applications**.
+Grab the universal `.dmg` from the [Releases page](https://github.com/libracoder/clipboardfox/releases/latest), open it, and drag **ClipboardFox.app** to **Applications**.
 
-> The DMG is built and signed (ad‑hoc) by [GitHub Actions](.github/workflows/build-dmg.yml) on every tagged release, so you can verify the build provenance directly against this repo.
+> The DMG is built and ad‑hoc signed by [GitHub Actions](.github/workflows/build-dmg.yml) on every tagged release, so you can verify the build provenance directly against this repo.
 
-On first launch, macOS Gatekeeper may warn that the app is from an unidentified developer. Right‑click the app and choose **Open** to dismiss the warning once.
+**First launch (important).** Because the build is ad‑hoc signed (not notarized by Apple), macOS Gatekeeper marks the downloaded app as quarantined and will say *"ClipboardFox is damaged and can't be opened"*. Strip the quarantine flag once and you're done:
+
+```bash
+xattr -cr /Applications/ClipboardFox.app
+open /Applications/ClipboardFox.app
+```
+
+Alternatively, right‑click the app in Finder → **Open** → confirm. macOS will remember the exemption.
 
 ### Build from source
 
@@ -70,14 +77,14 @@ On first launch, macOS Gatekeeper may warn that the app is from an unidentified 
 git clone https://github.com/libracoder/clipboardfox.git
 cd clipboardfox
 ./build.sh
-open build/ClipboardManager.app
+open build/ClipboardFox.app
 ```
 
 ### Package a DMG locally
 
 ```bash
 ./build.sh && ./package-dmg.sh
-# → build/ClipboardManager-<version>.dmg
+# → build/ClipboardFox-<version>.dmg
 ```
 
 ## Usage
@@ -108,7 +115,7 @@ Open settings via the gear icon in the bottom‑right corner of the popover.
 Clipboard history is stored locally at:
 
 ```
-~/Library/Application Support/ClipboardManager/history.json
+~/Library/Application Support/ClipboardFox/history.json
 ```
 
 Auto‑backup defaults to:
@@ -159,7 +166,7 @@ No. The app idles at <10 MB of RAM and 0% CPU. It only does work when you press 
 Yes — hover an entry and click the delete icon, or use the search bar to find and remove a specific clip.
 
 **Where is my history if I uninstall?**
-Your clipboard history JSON is in `~/Library/Application Support/ClipboardManager/`. Delete it manually if you want a clean wipe.
+Your clipboard history JSON is in `~/Library/Application Support/ClipboardFox/`. Delete it manually if you want a clean wipe.
 
 **Why not just use [`pbpaste`](x-man-page://pbpaste)?**
 You should — for the last clip. ClipboardFox is for everything before that.
