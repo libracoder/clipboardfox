@@ -3,11 +3,13 @@ set -e
 
 cd "$(dirname "$0")"
 
-echo "Building ClipboardManager..."
-swift build -c release
+echo "Building ClipboardManager (universal arm64 + x86_64)..."
+swift build -c release --arch arm64 --arch x86_64
 
-BINARY=$(swift build -c release --show-bin-path)/ClipboardManager
+BIN_DIR=$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)
+BINARY="$BIN_DIR/ClipboardManager"
 
+rm -rf build/ClipboardManager.app
 mkdir -p build/ClipboardManager.app/Contents/{MacOS,Resources}
 cp "$BINARY" build/ClipboardManager.app/Contents/MacOS/
 cp AppIcon.icns build/ClipboardManager.app/Contents/Resources/
