@@ -27,6 +27,8 @@ jobs:
         run: ./build.sh
 
       - name: Create DMG
+        env:
+          VERSION: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || github.sha }}
         run: ./package-dmg.sh
 
       - name: Upload DMG artifact

@@ -12,7 +12,10 @@ fi
 # Ad-hoc sign so the app can launch without a "damaged" warning when copied locally.
 codesign --force --deep --sign - "$APP"
 
-VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist" 2>/dev/null || echo "dev")
+# Version: explicit env var wins (CI passes the tag); otherwise read Info.plist; else "dev".
+if [ -z "${VERSION:-}" ]; then
+  VERSION=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP/Contents/Info.plist" 2>/dev/null || echo "dev")
+fi
 DMG="build/ClipboardManager-${VERSION}.dmg"
 
 STAGING=$(mktemp -d)
