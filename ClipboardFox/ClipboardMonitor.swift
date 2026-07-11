@@ -68,6 +68,7 @@ class ClipboardMonitor: ObservableObject {
     private var timer: Timer?
     private var lastChangeCount: Int
     private let storageURL: URL
+    private let ioQueue = DispatchQueue(label: "com.clipboardmanager.io", qos: .utility)
     let settings = AppSettings.shared
 
     init() {
@@ -140,10 +141,14 @@ class ClipboardMonitor: ObservableObject {
     }
 
     func saveHistory() {
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        if let data = try? encoder.encode(items) {
-            try? data.write(to: storageURL)
+        let itemsCopy = items
+        let url = storageURL
+        ioQueue.async {
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            if let data = try? encoder.encode(itemsCopy) {
+                try? data.write(to: url)
+            }
         }
     }
 
@@ -168,12 +173,15 @@ class ClipboardMonitor: ObservableObject {
     private func autoBackup() {
         let path = settings.backupPath
         guard !path.isEmpty else { return }
-        let url = URL(fileURLWithPath: path)
-        let encoder = JSONEncoder()
-        encoder.dateEncodingStrategy = .iso8601
-        encoder.outputFormatting = .prettyPrinted
-        if let data = try? encoder.encode(items) {
-            try? data.write(to: url)
+        let itemsCopy = items
+        ioQueue.async {
+            let url = URL(fileURLWithPath: path)
+            let encoder = JSONEncoder()
+            encoder.dateEncodingStrategy = .iso8601
+            encoder.outputFormatting = .prettyPrinted
+            if let data = try? encoder.encode(itemsCopy) {
+                try? data.write(to: url)
+            }
         }
     }
 

@@ -16,13 +16,15 @@ extension Notification.Name {
     static let dismissPopover = Notification.Name("dismissPopover")
 }
 
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, NSPopoverDelegate {
     var statusItem: NSStatusItem!
     var popover: NSPopover!
     var clipboardMonitor: ClipboardMonitor!
     var eventMonitor: Any?
+    var previousApp: NSRunningApplication?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        NSApp.setActivationPolicy(.accessory)
         clipboardMonitor = ClipboardMonitor()
 
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -36,6 +38,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         popover.contentSize = NSSize(width: 360, height: 450)
         popover.behavior = .transient
         popover.animates = true
+        popover.delegate = self
         popover.contentViewController = NSHostingController(
             rootView: ClipboardView(monitor: clipboardMonitor)
         )
@@ -117,9 +120,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if popover.isShown {
             popover.performClose(nil)
         } else {
+            previousApp = NSWorkspace.shared.frontmostApplication
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
             popover.contentViewController?.view.window?.makeKey()
-            NSApp.activate(ignoringOtherApps: true)
         }
+    }
+
+    func popoverDidClose(_ notification: Notification) {
+        if let app = previousApp, !app.isTerminated {
+            DispatchQueue.main.async {
+                app.activate()
+            }
+        }
+        previousApp = nil
     }
 }
